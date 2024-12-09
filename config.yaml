@@ -24,6 +24,9 @@ ent_coef: 0.0
 vf_coef: 0.5
 max_grad_norm: 0.5
 
+# Agent
+feature_dim: 128
+
 # to be filled in runtime
 batch_size: 0
 minibatch_size: 0

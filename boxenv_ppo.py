@@ -19,6 +19,7 @@ from ppo_eval import evaluate
 
 def make_env(gamma):
     def thunk():
+        # todo: test removing wrappers
         env = BoxTargetEnvironment()
         env = gym.wrappers.FlattenObservation(env)
         env = gym.wrappers.RecordEpisodeStatistics(env)
@@ -43,26 +44,31 @@ def layer_init(layer, std=np.sqrt(2), bias_const=0.0):
 
 
 class Agent(nn.Module):
-    def __init__(self, envs):
+    def __init__(self, envs, feature_dim=64):
         super().__init__()
         self.critic = nn.Sequential(
             layer_init(
-                nn.Linear(np.array(envs.single_observation_space.shape).prod(), 64)
+                nn.Linear(
+                    np.array(envs.single_observation_space.shape).prod(), feature_dim
+                )
             ),
             nn.Tanh(),
-            layer_init(nn.Linear(64, 64)),
+            layer_init(nn.Linear(feature_dim, feature_dim)),
             nn.Tanh(),
-            layer_init(nn.Linear(64, 1), std=1.0),
+            layer_init(nn.Linear(feature_dim, 1), std=1.0),
         )
         self.actor_mean = nn.Sequential(
             layer_init(
-                nn.Linear(np.array(envs.single_observation_space.shape).prod(), 64)
+                nn.Linear(
+                    np.array(envs.single_observation_space.shape).prod(), feature_dim
+                )
             ),
             nn.Tanh(),
-            layer_init(nn.Linear(64, 64)),
+            layer_init(nn.Linear(feature_dim, feature_dim)),
             nn.Tanh(),
             layer_init(
-                nn.Linear(64, np.prod(envs.single_action_space.shape)), std=0.01
+                nn.Linear(feature_dim, np.prod(envs.single_action_space.shape)),
+                std=0.01,
             ),
         )
         self.actor_logstd = nn.Parameter(
@@ -110,7 +116,7 @@ def train(args, writer, device):
         envs.single_action_space, gym.spaces.Box
     ), "only continuous action space is supported"
 
-    agent = Agent(envs).to(device)
+    agent = Agent(envs, args.feature_dim).to(device)
     optimizer = optim.Adam(agent.parameters(), lr=args.learning_rate, eps=1e-5)
 
     # ALGO Logic: Storage setup
