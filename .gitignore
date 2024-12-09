@@ -1,5 +1,6 @@
 runs
 saves
+tensorboard
 .DS_Store
 __pycache__
 .conda
