@@ -1,7 +1,7 @@
 import os
 import random
 import time
-from dataclasses import dataclass
+import omegaconf
 
 from tqdm import tqdm
 import gymnasium as gym
@@ -9,66 +9,12 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import tyro
+
 from torch.distributions.normal import Normal
 from torch.utils.tensorboard import SummaryWriter
 
 from testenv import BoxTargetEnvironment
 from ppo_eval import evaluate
-
-
-@dataclass
-class Args:
-    exp_name: str = os.path.basename(__file__)[: -len(".py")]
-    """the name of this experiment"""
-    seed: int = 1
-    """seed of the experiment"""
-    torch_deterministic: bool = True
-    """if toggled, `torch.backends.cudnn.deterministic=False`"""
-    cuda: bool = False
-    """if toggled, cuda will be enabled by default"""
-    save_model: bool = True
-    """whether to save model into the `runs/{run_name}` folder"""
-
-    # Algorithm specific arguments
-    total_timesteps: int = 800000
-    """total timesteps of the experiments"""
-    learning_rate: float = 3e-4
-    """the learning rate of the optimizer"""
-    num_envs: int = 4
-    """the number of parallel game environments"""
-    num_steps: int = 2048
-    """the number of steps to run in each environment per policy rollout"""
-    anneal_lr: bool = True
-    """Toggle learning rate annealing for policy and value networks"""
-    gamma: float = 0.99
-    """the discount factor gamma"""
-    gae_lambda: float = 0.95
-    """the lambda for the general advantage estimation"""
-    num_minibatches: int = 32
-    """the number of mini-batches"""
-    update_epochs: int = 10
-    """the K epochs to update the policy"""
-    norm_adv: bool = True
-    """Toggles advantages normalization"""
-    clip_coef: float = 0.2
-    """the surrogate clipping coefficient"""
-    clip_vloss: bool = True
-    """Toggles whether or not to use a clipped loss for the value function, as per the paper."""
-    ent_coef: float = 0.0
-    """coefficient of the entropy"""
-    vf_coef: float = 0.5
-    """coefficient of the value function"""
-    max_grad_norm: float = 0.5
-    """the maximum norm for the gradient clipping"""
-
-    # to be filled in runtime
-    batch_size: int = 0
-    """the batch size (computed in runtime)"""
-    minibatch_size: int = 0
-    """the mini-batch size (computed in runtime)"""
-    num_iterations: int = 0
-    """the number of iterations (computed in runtime)"""
 
 
 def make_env(gamma):
@@ -325,13 +271,17 @@ def train(args, writer, device):
 
 
 if __name__ == "__main__":
-    args = tyro.cli(Args)
+    # load omegaconf crom config.yaml
+    args = omegaconf.OmegaConf.load("config.yaml")
     args.batch_size = int(args.num_envs * args.num_steps)
     args.minibatch_size = int(args.batch_size // args.num_minibatches)
     args.num_iterations = args.total_timesteps // args.batch_size
-    run_name = f"{args.exp_name}__{args.seed}__{int(time.time())}"
+    run_name = f"{args.exp_name}_{int(time.time())}"
 
-    writer = SummaryWriter(f"runs/{run_name}")
+    os.makedirs(f"runs/{run_name}", exist_ok=True)
+    omegaconf.OmegaConf.save(args, f"runs/{run_name}/config.yaml")
+
+    writer = SummaryWriter(f"tensorboard/{run_name}")
     writer.add_text(
         "hyperparameters",
         "|param|value|\n|-|-|\n%s"
@@ -349,8 +299,7 @@ if __name__ == "__main__":
     agent = train(args, writer, device)
 
     if args.save_model:
-        os.makedirs(f"saves/{run_name}", exist_ok=True)
-        model_path = f"saves/{run_name}/{args.exp_name}.model"
+        model_path = f"runs/{run_name}/{args.exp_name}.model"
         torch.save(agent.state_dict(), model_path)
         print(f"model saved to {model_path}")
 

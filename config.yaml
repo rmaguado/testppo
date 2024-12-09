@@ -1,0 +1,30 @@
+# general
+exp_name: "box_env_incspeed"
+seed: 1
+torch_deterministic: True
+cuda: False
+save_model: True
+
+# training
+total_timesteps: 800000
+learning_rate: 3e-4
+num_envs: 4
+num_steps: 2048
+anneal_lr: True
+num_minibatches: 32
+update_epochs: 10
+
+# PPO
+gamma: 0.99
+gae_lambda: 0.95
+norm_adv: True
+clip_coef: 0.1
+clip_vloss: True
+ent_coef: 0.0
+vf_coef: 0.5
+max_grad_norm: 0.5
+
+# to be filled in runtime
+batch_size: 0
+minibatch_size: 0
+num_iterations: 0
