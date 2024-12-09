@@ -148,7 +148,11 @@ def train(cfg, writer, device):
     next_obs = torch.Tensor(next_obs).to(device)
     next_done = torch.zeros(cfg.num_envs).to(device)
 
-    for iteration in tqdm(range(1, cfg.num_iterations + 1)):
+    iterator = range(1, cfg.num_iterations + 1)
+    if cfg.use_tqdm:
+        iterator = tqdm(iterator)
+
+    for iteration in iterator:
         # Annealing the rate if instructed to do so.
         if cfg.anneal_lr:
             frac = 1.0 - (iteration - 1.0) / cfg.num_iterations

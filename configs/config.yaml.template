@@ -4,6 +4,7 @@ seed: 1
 torch_deterministic: True
 cuda: False
 save_model: True
+use_tqdm: False
 
 # training
 total_timesteps: 800000
