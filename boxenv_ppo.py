@@ -327,6 +327,7 @@ if __name__ == "__main__":
     agent = train(cfg, writer, device)
 
     if cfg.save_model:
+        os.makedirs(f"{output_dir}/models/{run_name}", exist_ok=True)
         model_path = f"{output_dir}/models/{run_name}/{cfg.exp_name}.model"
         torch.save(agent.state_dict(), model_path)
         print(f"model saved to {model_path}")
