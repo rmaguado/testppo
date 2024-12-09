@@ -29,7 +29,7 @@ class BoxTargetEnvironment(gym.Env):
         return self.observation(), {}
 
     def move_agent(self, action):
-        displacement = np.clip(action, -1, 1) * 2.0
+        displacement = np.clip(action, -1, 1) * 0.2
         self.agent_position += displacement
         self.agent_position = np.clip(self.agent_position, -1.0, 1.0)
 
