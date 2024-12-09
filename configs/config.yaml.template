@@ -1,5 +1,5 @@
 # general
-exp_name: "box_env_incspeed"
+exp_name: "default"
 seed: 1
 torch_deterministic: True
 cuda: True
@@ -7,15 +7,15 @@ save_model: True
 use_tqdm: False
 
 # training
-total_timesteps: 800000
+total_timesteps: 1500000
 learning_rate: 3e-4
-num_envs: 10
+num_envs: 16
 num_steps: 2048
-anneal_lr: True
+anneal_lr: False
 num_minibatches: 32
 update_epochs: 10
 
-# PPO
+# ppo
 gamma: 0.99
 gae_lambda: 0.95
 norm_adv: True
@@ -25,8 +25,8 @@ ent_coef: 0.0
 vf_coef: 0.5
 max_grad_norm: 0.5
 
-# Agent
-feature_dim: 128
+# agent
+feature_dim: 64
 
 # to be filled in runtime
 batch_size: 0
