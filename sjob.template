@@ -1,0 +1,27 @@
+#!/bin/bash
+
+## NAME CONF GPUTYPE
+
+#SBATCH --job-name=$NAME
+#SBATCH --output=$OUT/$NAME/$NAME-%j.out
+#SBATCH --nodes=1
+#SBATCH --nodelist=compute-cuda-02
+#SBATCH --cpus-per-task=24
+
+#SBATCH --ntasks-per-node=1
+#SBATCH --gres=gpu:$GPUTYPE:1
+
+#SBATCH --mem=96GB
+#SBATCH --partition=odap-gpu
+#SBATCH --signal=USR2@120
+#SBATCH --time=14400
+
+source $HOME/.conda_rc
+conda activate testppo
+cd $HOME/projects/testppo
+export PYTHONPATH=$PWD
+
+srun --unbuffered --ntasks=1 --cpus-per-task=16 \
+    python3 ${PWD}/boxenv_ppo.py \
+            --config-file="${PWD}/configs/$CONF" \
+            --output-dir="${PWD}/runs/$NAME"
