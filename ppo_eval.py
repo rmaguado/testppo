@@ -5,19 +5,13 @@ import torch
 
 
 def evaluate(
+    envs,
     model_path: str,
-    make_env: Callable,
-    env_id: str,
     eval_episodes: int,
-    run_name: str,
     Model: torch.nn.Module,
     device: torch.device = torch.device("cpu"),
-    capture_video: bool = True,
-    gamma: float = 0.99,
 ):
-    envs = gym.vector.SyncVectorEnv(
-        [make_env(env_id, 0, capture_video, run_name, gamma)]
-    )
+
     agent = Model(envs).to(device)
     agent.load_state_dict(torch.load(model_path, map_location=device))
     agent.eval()

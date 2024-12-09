@@ -355,20 +355,20 @@ if __name__ == "__main__":
         writer.add_scalar("losses/explained_variance", explained_var, global_step)
 
     if args.save_model:
+        os.makedirs(f"saves/{run_name}", exist_ok=True)
         model_path = f"saves/{run_name}/{args.exp_name}.model"
         torch.save(agent.state_dict(), model_path)
         print(f"model saved to {model_path}")
         from ppo_eval import evaluate
 
         episodic_returns = evaluate(
-            model_path,
-            make_env,
-            args.env_id,
+            gym.vector.SyncVectorEnv(
+                [make_env(args.env_id, 0, False, run_name, args.gamma)]
+            ),
+            model_path=model_path,
             eval_episodes=10,
-            run_name=f"{run_name}-eval",
             Model=Agent,
             device=device,
-            gamma=args.gamma,
         )
         for idx, episodic_return in enumerate(episodic_returns):
             writer.add_scalar("eval/episodic_return", episodic_return, idx)
