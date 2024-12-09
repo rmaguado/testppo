@@ -4,13 +4,13 @@ import numpy as np
 
 def evaluate(
     envs,
+    feature_dim: int,
     model_path: str,
     eval_episodes: int,
     Model: torch.nn.Module,
     device: torch.device = torch.device("cpu"),
 ):
-
-    agent = Model(envs).to(device)
+    agent = Model(envs, feature_dim).to(device)
     agent.load_state_dict(torch.load(model_path, map_location=device))
     agent.eval()
 

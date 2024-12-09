@@ -334,6 +334,7 @@ if __name__ == "__main__":
 
         episodic_returns = evaluate(
             gym.vector.SyncVectorEnv([make_env(cfg.gamma)]),
+            cfg.feature_dim,
             model_path=model_path,
             eval_episodes=10,
             Model=Agent,

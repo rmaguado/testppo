@@ -365,6 +365,7 @@ if __name__ == "__main__":
             gym.vector.SyncVectorEnv(
                 [make_env(args.env_id, 0, False, run_name, args.gamma)]
             ),
+            feature_dim=64,
             model_path=model_path,
             eval_episodes=10,
             Model=Agent,
