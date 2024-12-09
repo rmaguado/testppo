@@ -319,7 +319,10 @@ if __name__ == "__main__":
     torch.manual_seed(cfg.seed)
     torch.backends.cudnn.deterministic = cfg.torch_deterministic
 
-    device = torch.device("cpu")
+    if cfg.cuda:
+        assert torch.cuda.is_available(), "CUDA is not available"
+    device = torch.device("cuda" if cfg.cuda else "cpu")
+    print("Using", device)
 
     agent = train(cfg, writer, device)
 
