@@ -2,14 +2,14 @@
 exp_name: "box_env_incspeed"
 seed: 1
 torch_deterministic: True
-cuda: False
+cuda: True
 save_model: True
 use_tqdm: False
 
 # training
 total_timesteps: 800000
 learning_rate: 3e-4
-num_envs: 4
+num_envs: 10
 num_steps: 2048
 anneal_lr: True
 num_minibatches: 32
